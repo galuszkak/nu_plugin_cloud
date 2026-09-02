@@ -8,8 +8,8 @@ Provides uniform access to cloud storage services for nushell.
 - `cloud rm` - Remove a file from cloud sotrage
 - `cloud save` - Save a file to cloud storage
 - AWS S3 support
+- Google Cloud Storage support
 - Coming Soon: Azure support
-- Coming Soon: Google cloud support
 
 ## Installation
 
@@ -69,6 +69,29 @@ output = json
 sso_start_url = https://d-92677e5ab0.awsapps.com/start
 sso_region = us-west-2
 sso_registration_scopes = sso:account:access
+```
+
+# Google Cloud Storage Support
+
+Configuration for Google Cloud Storage uses Application Default Credentials (ADC) and/or service account configuration supported by `object_store`.
+
+## Google Cloud Storage Setup
+
+Supported URI scheme for this release:
+- `gs://<bucket>/<path>`
+
+Authentication options:
+- ADC auto-discovery (for example with `gcloud auth application-default login`)
+- `GOOGLE_APPLICATION_CREDENTIALS` pointing to an ADC JSON file
+- `GOOGLE_SERVICE_ACCOUNT`, `GOOGLE_SERVICE_ACCOUNT_PATH`, or `SERVICE_ACCOUNT` pointing to a service account JSON file
+- `GOOGLE_SERVICE_ACCOUNT_KEY` containing JSON serialized service account credentials
+
+Examples:
+```nu
+cloud ls gs://my-bucket/
+cloud open gs://my-bucket/file.csv
+[[a b]; [1 2]] | cloud save gs://my-bucket/file.csv
+cloud rm gs://my-bucket/file.csv
 ```
 ## Non-Cloud Storage
 

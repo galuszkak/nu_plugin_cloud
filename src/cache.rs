@@ -28,6 +28,7 @@ pub enum ObjectStoreCacheKey {
     Memory,
     Local,
     AmazonS3 { bucket: String, region: String },
+    GoogleCloudStorage { bucket: String },
 }
 
 impl From<&NuObjectStore> for ObjectStoreCacheKey {
@@ -39,7 +40,11 @@ impl From<&NuObjectStore> for ObjectStoreCacheKey {
                 bucket: bucket.to_owned(),
                 region: region.to_owned(),
             },
-            NuObjectStore::GoogleCloudStorage(_) => unimplemented!(),
+            NuObjectStore::GoogleCloudStorage { bucket, .. } => {
+                ObjectStoreCacheKey::GoogleCloudStorage {
+                    bucket: bucket.to_owned(),
+                }
+            }
             NuObjectStore::MicrosoftAzure(_) => unimplemented!(),
             NuObjectStore::Http(_) => unimplemented!(),
         }
@@ -141,10 +146,33 @@ impl Cache {
 
 fn cache_get_error(e: impl std::error::Error) -> ShellError {
     ShellError::GenericError {
-        error: format!("Error fetching data from obect store: {e}"),
+        error: format!("Error fetching data from object store: {e}"),
         msg: "".into(),
         span: None,
         help: None,
         inner: vec![],
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use crate::providers::NuObjectStore;
+    use object_store::memory::InMemory;
+    use std::sync::Arc;
+
+    use super::ObjectStoreCacheKey;
+
+    #[test]
+    fn maps_google_cloud_storage_cache_key() {
+        let store = NuObjectStore::GoogleCloudStorage {
+            store: Arc::new(InMemory::new()),
+            bucket: "bucket-1".to_string(),
+        };
+        assert_eq!(
+            ObjectStoreCacheKey::from(&store),
+            ObjectStoreCacheKey::GoogleCloudStorage {
+                bucket: "bucket-1".to_string()
+            }
+        );
     }
 }

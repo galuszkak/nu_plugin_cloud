@@ -149,7 +149,7 @@ async fn liststream_to_cloud(
     }
 
     let _ = write.finish().await.map_err(|e| ShellError::GenericError {
-        error: format!("Could not write to S3: {e}"),
+        error: format!("Could not write to cloud storage: {e}"),
         msg: "".into(),
         span: None,
         help: None,
@@ -188,7 +188,7 @@ async fn stream_to_cloud_async(
     let _ = generic_copy(source, &mut write, span, signals)?;
 
     let _ = write.finish().await.map_err(|e| ShellError::GenericError {
-        error: format!("Could not write to S3: {e}"),
+        error: format!("Could not write to cloud storage: {e}"),
         msg: "".into(),
         span: None,
         help: None,
@@ -309,7 +309,7 @@ async fn stream_bytes(
         .put(&path, payload)
         .await
         .map_err(|e| ShellError::GenericError {
-            error: format!("Could not write to S3: {e}"),
+            error: format!("Could not write to cloud storage: {e}"),
             msg: "".into(),
             span: None,
             help: None,
